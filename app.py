@@ -10,16 +10,19 @@ qa_data = {
 
 @app.route("/api/messages", methods=["POST"])
 def messages():
-    data = request.json
-    user_message = data.get("text") or data.get("value", "") or ""
-    if not user_message and "type" in data and data["type"] == "message":
-        user_message = data.get("text", "")  # fallback
+    data = request.json or {}
+    
+    if data.get("type") == "message":
+        user_message = data.get("text", "").lower()
+        response_text = qa_data.get(user_message, "Sorry, I don't understand that yet.")
 
-    response = qa_data.get(user_message.lower(), "Sorry, I don't understand that yet.")
-    return jsonify({
-        "type": "message",
-        "text": response
-    })
+        return jsonify({
+            "type": "message",
+            "text": response_text
+        })
+    
+    # Respond with 200 OK to all non-message activities (like conversationUpdate)
+    return jsonify({}), 200
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3978)
+    app.run(host="0.0.0.0", port=8000)
