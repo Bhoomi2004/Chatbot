@@ -1,18 +1,17 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
-import os
 import datetime
 
 app = Flask(__name__)
 CORS(app)
 
-# Load credentials from environment variables
-MICROSOFT_APP_ID = os.environ.get("MicrosoftAppId", "")
-MICROSOFT_APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "")
-print("MicrosoftAppId:", MICROSOFT_APP_ID)
-print("MicrosoftAppPassword:", MICROSOFT_APP_PASSWORD)
+# ✅ Hardcoded credentials for local testing (DANGER: Don't expose in public repos!)
+MICROSOFT_APP_ID = "e74046ec-9851-4219-a94f-a5cdf3f19e8a"
+MICROSOFT_APP_PASSWORD = "223acc1e-63b7-4634-9f3c-0bbafcf70ec6"
 
+print("✅ MicrosoftAppId loaded:", MICROSOFT_APP_ID)
+print("✅ MicrosoftAppPassword loaded:", MICROSOFT_APP_PASSWORD)
 
 qa_data = {
     "hello": "Hi there! I'm your chatbot.",
@@ -48,6 +47,7 @@ def messages():
             "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
         }
 
+        # Send reply to Bot Framework
         conversation_id = data["conversation"]["id"]
         service_url = data["serviceUrl"]
         post_url = f"{service_url}v3/conversations/{conversation_id}/activities"
@@ -76,10 +76,12 @@ def get_bot_token():
     headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
 
     response = requests.post(url, data=payload, headers=headers)
-    token = response.json().get("access_token")
-    print("🔑 Token Response:", response.status_code, response.text)  # <-- Add this line
-    token = response.json().get("access_token")
-    return token
+    print("🔐 Token Response:", response.status_code, response.text)
+
+    if response.status_code != 200:
+        return None
+
+    return response.json().get("access_token")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
