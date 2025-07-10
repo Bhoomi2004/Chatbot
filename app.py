@@ -17,8 +17,13 @@ qa_data = {
     "hello": "Hi there! I'm your chatbot.",
     "what is azure?": "Azure is Microsoft's cloud platform for building, testing, and managing applications.",
     "what is ai?": "AI stands for Artificial Intelligence, which enables machines to mimic human intelligence.",
-    "bye": "Goodbye! Have a great day!"
+    "bye": "Goodbye! Have a great day!",
+    "who made you?": "I was built using Python and Flask by Bhoomi!",
+    "what is cloud computing?": "Cloud computing is the delivery of computing services like servers, storage, databases, networking, software over the Internet.",
+    "tell me a joke": "Why don't programmers like nature? It has too many bugs!",
+    "what is cybersecurity?": "Cybersecurity is the practice of protecting systems, networks, and programs from digital attacks."
 }
+
 
 @app.route("/api/messages", methods=["POST"])
 def messages():
