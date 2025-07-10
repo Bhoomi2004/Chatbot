@@ -65,7 +65,7 @@ def messages():
     return jsonify({}), 200
 
 def get_bot_token():
-    url = "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token"
+    url ="https://login.microsoftonline.com/8695b83d-c692-47ef-ad7a-376cbce3664f/oauth2/v2.0/token"
     payload = {
         'grant_type': 'client_credentials',
         'client_id': MICROSOFT_APP_ID,
