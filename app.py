@@ -12,22 +12,22 @@ qa_data = {
 @app.route("/api/messages", methods=["POST"])
 def messages():
     data = request.get_json(force=True)
+    print("📨 Received request:", data)
 
-    # ✅ Handle messages only
     if data.get("type") == "message":
         user_message = data.get("text", "").strip().lower()
+        print("🧠 User said:", user_message)
 
-        # 🔍 Respond if known
         response_text = qa_data.get(user_message, "Sorry, I don't understand that question.")
+        print("💬 Responding with:", response_text)
 
         return jsonify({
             "type": "message",
             "text": response_text
         })
 
-    # ℹ️ Return 200 OK for other activity types
+    print("⚙️ Received non-message activity type:", data.get("type"))
     return jsonify({}), 200
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
