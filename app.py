@@ -3,7 +3,7 @@ from flask_cors import CORS
 
 
 app = Flask(__name__)
-CORS(app, origins=["https://webchat.botframework.com"])
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 qa_data = {
     "hello": "Hi there! I'm your chatbot.",
