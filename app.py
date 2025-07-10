@@ -13,17 +13,9 @@ MICROSOFT_APP_PASSWORD = "4dV8Q~VJRNMQrP-RDH~fuuV8KfIDBPeArxWIHcgP"
 print("✅ MicrosoftAppId loaded:", MICROSOFT_APP_ID)
 print("✅ MicrosoftAppPassword loaded:", MICROSOFT_APP_PASSWORD)
 
-qa_data = {
-    "hello": "Hi there! I'm your chatbot.",
-    "what is azure?": "Azure is Microsoft's cloud platform for building, testing, and managing applications.",
-    "what is ai?": "AI stands for Artificial Intelligence, which enables machines to mimic human intelligence.",
-    "bye": "Goodbye! Have a great day!",
-    "who made you?": "I was built using Python and Flask by Bhoomi!",
-    "what is cloud computing?": "Cloud computing is the delivery of computing services like servers, storage, databases, networking, software over the Internet.",
-    "tell me a joke": "Why don't programmers like nature? It has too many bugs!",
-    "what is cybersecurity?": "Cybersecurity is the practice of protecting systems, networks, and programs from digital attacks."
-}
-
+# ✅ Azure QnA Knowledge Base info
+PREDICTION_URL = "https://bhoomilanguageservice.cognitiveservices.azure.com/language/:query-knowledgebases?projectName=Chatbot&api-version=2021-10-01&deploymentName=production"
+RESOURCE_KEY = "CLeq1e2IbdewNodLH2JIDbHumU5rKGi3mo3ROSRz7pPmfQOWQAOjJQQJ99BGACGhslBXJ3w3AAAaACOG3QrZ"
 
 @app.route("/api/messages", methods=["POST"])
 def messages():
@@ -31,10 +23,11 @@ def messages():
     print("📨 Received request:", data)
 
     if data.get("type") == "message":
-        user_message = data.get("text", "").strip().lower()
+        user_message = data.get("text", "").strip()
         print("🧠 User said:", user_message)
 
-        response_text = qa_data.get(user_message, "Sorry, I don't understand that question.")
+        # 🔁 Replace hardcoded qa_data with Knowledge Base call
+        response_text = query_knowledge_base(user_message)
         print("💬 Responding with:", response_text)
 
         reply_activity = {
@@ -70,7 +63,7 @@ def messages():
     return jsonify({}), 200
 
 def get_bot_token():
-    url ="https://login.microsoftonline.com/8695b83d-c692-47ef-ad7a-376cbce3664f/oauth2/v2.0/token"
+    url = "https://login.microsoftonline.com/8695b83d-c692-47ef-ad7a-376cbce3664f/oauth2/v2.0/token"
     payload = {
         'grant_type': 'client_credentials',
         'client_id': MICROSOFT_APP_ID,
@@ -87,6 +80,28 @@ def get_bot_token():
         return None
 
     return response.json().get("access_token")
+
+def query_knowledge_base(question):
+    headers = {
+        "Ocp-Apim-Subscription-Key": RESOURCE_KEY,
+        "Content-Type": "application/json"
+    }
+
+    body = {
+        "kind": "question",
+        "question": question
+    }
+
+    try:
+        response = requests.post(PREDICTION_URL, headers=headers, json=body)
+        result = response.json()
+        if result.get("answers"):
+            return result["answers"][0]["answer"]
+        else:
+            return "Sorry, I couldn't find an answer to that question."
+    except Exception as e:
+        print("❌ Error querying KB:", e)
+        return "Oops! Something went wrong while accessing the knowledge base."
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
