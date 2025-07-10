@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import requests
 import uuid
 import datetime
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": ["https://webchat.botframework.com", "https://portal.azure.com"]}}, supports_credentials=True)
+CORS(app)
 
 qa_data = {
     "hello": "Hi there! I'm your chatbot.",
@@ -25,21 +26,35 @@ def messages():
         response_text = qa_data.get(user_message, "Sorry, I don't understand that question.")
         print("💬 Responding with:", response_text)
 
-        return jsonify({
+        # Construct the reply message as per Bot Framework schema
+        reply_activity = {
             "type": "message",
-            "text": response_text,
             "from": {
-                "id": "bot",
-                "name": "ChatBot"
+                "id": data["recipient"]["id"],
+                "name": data["recipient"].get("name", "bot")
             },
             "recipient": {
                 "id": data["from"]["id"],
                 "name": data["from"].get("name", "")
             },
-            "replyToId": data.get("id"),
-            "timestamp": datetime.datetime.utcnow().isoformat(),
-            "id": str(uuid.uuid4())
-        })
+            "replyToId": data["id"],
+            "text": response_text,
+            "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+        }
+
+        # Send the reply back to the serviceUrl
+        conversation_id = data["conversation"]["id"]
+        service_url = data["serviceUrl"]
+        post_url = f"{service_url}v3/conversations/{conversation_id}/activities"
+
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        response = requests.post(post_url, json=reply_activity, headers=headers)
+        print(f"📤 Sent to Bot Framework: {response.status_code} - {response.text}")
+
+        return '', 200
 
     return jsonify({}), 200
 
