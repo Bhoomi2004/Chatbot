@@ -8,7 +8,7 @@ CORS(app)
 
 # ✅ Hardcoded credentials for local testing (DANGER: Don't expose in public repos!)
 MICROSOFT_APP_ID = "e74046ec-9851-4219-a94f-a5cdf3f19e8a"
-MICROSOFT_APP_PASSWORD = "223acc1e-63b7-4634-9f3c-0bbafcf70ec6"
+MICROSOFT_APP_PASSWORD = "4dV8Q~VJRNMQrP-RDH~fuuV8KfIDBPeArxWIHcgP"
 
 print("✅ MicrosoftAppId loaded:", MICROSOFT_APP_ID)
 print("✅ MicrosoftAppPassword loaded:", MICROSOFT_APP_PASSWORD)
