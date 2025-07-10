@@ -10,6 +10,9 @@ CORS(app)
 # Load credentials from environment variables
 MICROSOFT_APP_ID = os.environ.get("MicrosoftAppId", "")
 MICROSOFT_APP_PASSWORD = os.environ.get("MicrosoftAppPassword", "")
+print("MicrosoftAppId:", MICROSOFT_APP_ID)
+print("MicrosoftAppPassword:", MICROSOFT_APP_PASSWORD)
+
 
 qa_data = {
     "hello": "Hi there! I'm your chatbot.",
@@ -73,6 +76,8 @@ def get_bot_token():
     headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
 
     response = requests.post(url, data=payload, headers=headers)
+    token = response.json().get("access_token")
+    print("🔑 Token Response:", response.status_code, response.text)  # <-- Add this line
     token = response.json().get("access_token")
     return token
 
